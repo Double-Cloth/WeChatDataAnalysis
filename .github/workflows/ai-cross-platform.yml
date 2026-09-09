@@ -37,6 +37,10 @@ jobs:
         os: [windows-2022, macos-14]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
+    env:
+      # macOS setup-python builds may lack SQLite loadable-extension support.
+      # Use uv-managed CPython for both source checks and the frozen runtime.
+      UV_MANAGED_PYTHON: 'true'
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
@@ -46,6 +50,8 @@ jobs:
         with:
           node-version: 22
       - run: python -m pip install uv
+      - name: Install Python with SQLite extension support
+        run: uv python install 3.11
       - run: uv sync --locked --extra build
       - name: AI runtime and media (synthetic, no API calls)
         run: uv run python tools/verify_ai_runtime.py
