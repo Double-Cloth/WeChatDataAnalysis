@@ -136,6 +136,15 @@ jobs:
           "broker-signer-sha256=$brokerSigner" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
           "private-root-sha256=$privateRoot" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
+      - name: Download latest Advanced installer
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download advanced-latest \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern 'advanced-*' \
+            --dir release-assets
       - name: Generate release notes from commits
         shell: pwsh
         run: |
@@ -715,6 +724,15 @@ jobs:
           path: release-assets
           merge-multiple: true
 
+      - name: Download latest Advanced installer
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download advanced-latest \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern 'advanced-*' \
+            --dir release-assets
       - name: Generate release notes from commits
         shell: bash
         run: |
@@ -727,6 +745,9 @@ jobs:
             range="$tag"
           fi
           {
+            cat .github/release-editions.md
+            echo
+            echo
             echo "## 更新内容 ($tag)"
             echo
             git log --no-merges --pretty=format:'- %s (%h)' --reverse -n 60 "$range"
