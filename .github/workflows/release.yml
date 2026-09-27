@@ -141,10 +141,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release download advanced-latest \
-            --repo "$GITHUB_REPOSITORY" \
-            --pattern 'advanced-*' \
-            --dir release-assets
+          set -euo pipefail
+          advanced_assets="$(gh api "repos/$GITHUB_REPOSITORY/releases" --paginate \
+            --jq '.[] | select(.tag_name == "advanced-latest") | .assets[] | select(.name | startswith("advanced-")) | .name')"
+          if [[ -n "$advanced_assets" ]]; then
+            gh release download advanced-latest \
+              --repo "$GITHUB_REPOSITORY" \
+              --pattern 'advanced-*' \
+              --dir release-assets
+          fi
       - name: Generate release notes from commits
         shell: pwsh
         run: |
@@ -729,10 +734,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release download advanced-latest \
-            --repo "$GITHUB_REPOSITORY" \
-            --pattern 'advanced-*' \
-            --dir release-assets
+          set -euo pipefail
+          advanced_assets="$(gh api "repos/$GITHUB_REPOSITORY/releases" --paginate \
+            --jq '.[] | select(.tag_name == "advanced-latest") | .assets[] | select(.name | startswith("advanced-")) | .name')"
+          if [[ -n "$advanced_assets" ]]; then
+            gh release download advanced-latest \
+              --repo "$GITHUB_REPOSITORY" \
+              --pattern 'advanced-*' \
+              --dir release-assets
+          fi
       - name: Generate release notes from commits
         shell: bash
         run: |
@@ -746,6 +756,10 @@ jobs:
           fi
           {
             cat .github/release-editions.md
+            if [[ -z "$(find release-assets -maxdepth 1 -type f -name 'advanced-*' -print -quit)" ]]; then
+              echo
+              echo '**本次尚未提供高级版安装包，请下载开源版安装包。**'
+            fi
             echo
             echo
             echo "## 更新内容 ($tag)"
