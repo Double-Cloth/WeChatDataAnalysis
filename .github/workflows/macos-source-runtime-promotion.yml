@@ -221,7 +221,8 @@ jobs:
             --client-signer-sha256 "$WCE_NATIVE_CORE_CLIENT_SIGNER_SHA256" \
             --broker-signer-sha256 "$WCE_NATIVE_CORE_BROKER_SIGNER_SHA256" \
             --host-signer-sha256 "$WCE_NATIVE_CORE_HOST_SIGNER_SHA256" \
-            --private-root-sha256 "$WCE_NATIVE_CORE_PRIVATE_ROOT_SHA256"
+            --private-root-sha256 "$WCE_NATIVE_CORE_PRIVATE_ROOT_SHA256" \
+            --read-only
 
       - name: Verify source-public XKey producer artifact
         shell: bash
